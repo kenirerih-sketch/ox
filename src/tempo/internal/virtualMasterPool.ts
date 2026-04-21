@@ -54,7 +54,8 @@ export async function resolve(): Promise<Pool | undefined> {
  * @internal
  */
 export async function resolveNode(): Promise<Pool | undefined> {
-  const { Worker } = await import('node:worker_threads')
+  const id = 'node:worker_threads'
+  const { Worker } = await import(id)
   const { wasmBase64 } = await import('./mine.wasm.js')
   const workerSource = getNodeWorkerSource()
 
@@ -68,8 +69,8 @@ export async function resolveNode(): Promise<Pool | undefined> {
         },
       })
       worker.on('message', (msg: Message) => onMessage(msg))
-      worker.on('error', (err) => onError(err))
-      worker.on('exit', (code) => {
+      worker.on('error', (err: unknown) => onError(err))
+      worker.on('exit', (code: number) => {
         if (code !== 0)
           onError(
             new Errors.BaseError(
